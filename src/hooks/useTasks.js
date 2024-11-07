@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useLocalStorage from "./useLocalStorage";
 import { formatDateTime } from "../utils/dateUtils";
 
@@ -11,6 +11,45 @@ const useTasks = () => {
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [newDetail, setNewDetail] = useState("");
   const [newAssignee, setNewAssignee] = useState("");
+  const [lastCheckedDate, setLastCheckedDate] = useLocalStorage(
+    "lastCheckedDate",
+    null
+  );
+
+  // 날짜가 변경되었을 때 미완료 작업 이동
+  useEffect(() => {
+    const currentDate = new Date().toISOString().split("T")[0];
+
+    // 마지막 체크 날짜가 없거나 오늘과 다른 경우
+    if (lastCheckedDate !== currentDate) {
+      const updatedTasks = tasks.map((task) => {
+        // 이전 날짜의 미완료 작업만 처리
+        if (task.date < currentDate && task.status !== "completed") {
+          return {
+            ...task,
+            date: currentDate,
+            updateHistory: [
+              ...task.updateHistory,
+              {
+                timestamp: new Date().toISOString(),
+                type: "autoForward",
+                content: `미완료로 인해 ${task.date}에서 ${currentDate}로 자동 이동되었습니다.`,
+              },
+            ],
+          };
+        }
+        return task;
+      });
+
+      setTasks(updatedTasks);
+      setLastCheckedDate(currentDate);
+    }
+  }, [tasks, lastCheckedDate, setLastCheckedDate, setTasks]);
+
+  // 날짜 선택 핸들러 수정
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+  };
 
   const handleExpandClick = (taskId) => {
     setExpandedTaskId(taskId);
@@ -128,13 +167,11 @@ const useTasks = () => {
     setNewAssignee("");
   };
 
-  // 선택된 날짜의 할일 필터링
-  const filteredTasks = tasks.filter((task) => task.date === selectedDate);
-
   return {
-    tasks: filteredTasks,
+    tasks: tasks.filter((task) => task.date === selectedDate),
+    allTasks: tasks,
     selectedDate,
-    setSelectedDate,
+    setSelectedDate: handleDateChange,
     newTask,
     setNewTask,
     expandedTaskId,

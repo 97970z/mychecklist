@@ -8,6 +8,7 @@ import useDrawer from "./hooks/useDrawer";
 const App = () => {
   const {
     tasks,
+    allTasks,
     selectedDate,
     setSelectedDate,
     newTask,
@@ -62,6 +63,7 @@ const App = () => {
         newTask={newTask}
         onNewTaskChange={setNewTask}
         onTaskAdd={handleAddTask}
+        allTasks={allTasks}
       />
       <TaskBoard
         tasks={tasks}
