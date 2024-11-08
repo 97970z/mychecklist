@@ -168,7 +168,9 @@ const useTasks = () => {
   };
 
   return {
-    tasks: tasks.filter((task) => task.date === selectedDate),
+    tasks: tasks.filter(
+      (task) => task.status === "completed" || task.date === selectedDate
+    ),
     allTasks: tasks,
     selectedDate,
     setSelectedDate: handleDateChange,
