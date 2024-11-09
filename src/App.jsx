@@ -25,6 +25,7 @@ const App = () => {
     handleAddDetail,
     handleUpdateAssignee,
     formatDateTime,
+    getUncompletedTasksCount,
   } = useTasks();
 
   const { memos, newMemo, setNewMemo, handleAddMemo, handleDeleteMemo } =
@@ -64,6 +65,7 @@ const App = () => {
         onNewTaskChange={setNewTask}
         onTaskAdd={handleAddTask}
         allTasks={allTasks}
+        getUncompletedTasksCount={getUncompletedTasksCount} // 함수 전달
       />
       <TaskBoard
         tasks={tasks}

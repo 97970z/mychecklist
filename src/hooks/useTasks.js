@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import useLocalStorage from "./useLocalStorage";
-import { formatDateTime } from "../utils/dateUtils";
+import {
+  formatDateTime,
+  getTodayDate,
+  isBeforeToday,
+} from "../utils/dateUtils";
 
 const useTasks = () => {
   const [tasks, setTasks] = useLocalStorage("tasks", []);
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const [selectedDate, setSelectedDate] = useState(getTodayDate());
   const [newTask, setNewTask] = useState("");
   const [expandedTaskId, setExpandedTaskId] = useState(null);
   const [newDetail, setNewDetail] = useState("");
@@ -18,22 +20,22 @@ const useTasks = () => {
 
   // 날짜가 변경되었을 때 미완료 작업 이동
   useEffect(() => {
-    const currentDate = new Date().toISOString().split("T")[0];
+    const todayDate = getTodayDate();
 
     // 마지막 체크 날짜가 없거나 오늘과 다른 경우
-    if (lastCheckedDate !== currentDate) {
+    if (lastCheckedDate !== todayDate) {
       const updatedTasks = tasks.map((task) => {
         // 이전 날짜의 미완료 작업만 처리
-        if (task.date < currentDate && task.status !== "completed") {
+        if (isBeforeToday(task.date) && task.status !== "completed") {
           return {
             ...task,
-            date: currentDate,
+            date: todayDate,
             updateHistory: [
               ...task.updateHistory,
               {
                 timestamp: new Date().toISOString(),
                 type: "autoForward",
-                content: `미완료로 인해 ${task.date}에서 ${currentDate}로 자동 이동되었습니다.`,
+                content: `미완료로 인해 ${task.date}에서 ${todayDate}로 자동 이동되었습니다.`,
               },
             ],
           };
@@ -42,17 +44,35 @@ const useTasks = () => {
       });
 
       setTasks(updatedTasks);
-      setLastCheckedDate(currentDate);
+      setLastCheckedDate(todayDate);
     }
   }, [tasks, lastCheckedDate, setLastCheckedDate, setTasks]);
 
-  // 날짜 선택 핸들러 수정
+  // 미완료 작업 수 계산
+  const getUncompletedTasksCount = (date) => {
+    const todayDate = getTodayDate();
+
+    // 선택된 날짜가 오늘이 아니면 0 반환
+    if (date !== todayDate) {
+      return 0;
+    }
+
+    // 오늘 날짜인 경우에만 이전 날짜들의 미완료 작업 수를 계산
+    return tasks.filter(
+      (task) =>
+        isBeforeToday(task.date) && // 오늘 이전의 날짜인지 확인
+        task.status !== "completed" // 완료되지 않은 작업
+    ).length;
+  };
+
+  // 날짜 선택 핸들러
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
   };
 
+  // 할일 확장/축소 핸들러
   const handleExpandClick = (taskId) => {
-    setExpandedTaskId(taskId);
+    setExpandedTaskId(expandedTaskId === taskId ? null : taskId);
   };
 
   // 새 할일 추가
@@ -167,10 +187,20 @@ const useTasks = () => {
     setNewAssignee("");
   };
 
+  // 필터링된 task 목록 가져오기
+  const getFilteredTasks = () => {
+    return tasks.filter((task) => {
+      if (task.status === "completed") {
+        // 완료된 작업은 모든 날짜에 표시
+        return true;
+      }
+      // 미완료 작업은 해당 날짜에만 표시
+      return task.date === selectedDate;
+    });
+  };
+
   return {
-    tasks: tasks.filter(
-      (task) => task.status === "completed" || task.date === selectedDate
-    ),
+    tasks: getFilteredTasks(),
     allTasks: tasks,
     selectedDate,
     setSelectedDate: handleDateChange,
@@ -188,6 +218,7 @@ const useTasks = () => {
     handleAddDetail,
     handleUpdateAssignee,
     formatDateTime,
+    getUncompletedTasksCount,
   };
 };
 
