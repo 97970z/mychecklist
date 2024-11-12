@@ -1,3 +1,5 @@
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import ESGPage from "./components/ESG/ESGPage";
 import Layout from "./components/Layout/Layout";
 import TaskForm from "./components/Task/TaskForm";
 import TaskBoard from "./components/Task/TaskBoard";
@@ -48,34 +50,46 @@ const App = () => {
   };
 
   return (
-    <Layout
-      isDrawerOpen={isDrawerOpen}
-      onDrawerToggle={handleDrawerToggle}
-      onDrawerClose={handleDrawerClose}
-      memos={memos}
-      newMemo={newMemo}
-      onNewMemoChange={setNewMemo}
-      onMemoAdd={handleAddMemo}
-      onMemoDelete={handleDeleteMemo}
-    >
-      <TaskForm
-        selectedDate={selectedDate}
-        onDateChange={setSelectedDate}
-        newTask={newTask}
-        onNewTaskChange={setNewTask}
-        onTaskAdd={handleAddTask}
-        allTasks={allTasks}
-        getUncompletedTasksCount={getUncompletedTasksCount} // 함수 전달
-      />
-      <TaskBoard
-        tasks={tasks}
-        expandedTaskId={expandedTaskId}
-        onExpandClick={handleExpandClick}
-        onStatusChange={handleStatusChange}
-        onDelete={handleDeleteTask}
-        taskDetailProps={taskDetailProps}
-      />
-    </Layout>
+    <Router>
+      <Layout
+        isDrawerOpen={isDrawerOpen}
+        onDrawerToggle={handleDrawerToggle}
+        onDrawerClose={handleDrawerClose}
+        memos={memos}
+        newMemo={newMemo}
+        onNewMemoChange={setNewMemo}
+        onMemoAdd={handleAddMemo}
+        onMemoDelete={handleDeleteMemo}
+      >
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <>
+                <TaskForm
+                  selectedDate={selectedDate}
+                  onDateChange={setSelectedDate}
+                  newTask={newTask}
+                  onNewTaskChange={setNewTask}
+                  onTaskAdd={handleAddTask}
+                  allTasks={allTasks}
+                  getUncompletedTasksCount={getUncompletedTasksCount}
+                />
+                <TaskBoard
+                  tasks={tasks}
+                  expandedTaskId={expandedTaskId}
+                  onExpandClick={handleExpandClick}
+                  onStatusChange={handleStatusChange}
+                  onDelete={handleDeleteTask}
+                  taskDetailProps={taskDetailProps}
+                />
+              </>
+            }
+          />
+          <Route path="/mychecklist/esg" element={<ESGPage />} />
+        </Routes>
+      </Layout>
+    </Router>
   );
 };
 

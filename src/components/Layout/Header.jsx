@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import { AppBar, Toolbar, Typography, IconButton } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import { AppBar, Toolbar, Typography, IconButton, Button } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 
 const Header = ({ onMenuClick }) => {
@@ -17,6 +18,12 @@ const Header = ({ onMenuClick }) => {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           할 일 관리
         </Typography>
+        <Button component={RouterLink} to="/" color="inherit" sx={{ mr: 2 }}>
+          할 일
+        </Button>
+        <Button component={RouterLink} to="/mychecklist/esg" color="inherit">
+          ESG
+        </Button>
       </Toolbar>
     </AppBar>
   );
