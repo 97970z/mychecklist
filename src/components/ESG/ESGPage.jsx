@@ -64,7 +64,10 @@ const ESGPage = () => {
           </Box>
         </Box>
       ) : (
-        <VolunteerAnalytics analytics={getAnalytics()} />
+        <VolunteerAnalytics
+          analytics={getAnalytics()}
+          volunteers={volunteers}
+        />
       )}
     </Container>
   );
