@@ -142,6 +142,7 @@ const useVolunteers = () => {
     const analytics = {
       totalVolunteers: 0,
       byCategory: {},
+      byCategoryCount: {}, // 추가: 카테고리별 완료된 일정 수
       byOrganization: {},
       monthlyStats: {},
       yearlyStats: {},
@@ -165,6 +166,10 @@ const useVolunteers = () => {
         // 카테고리별 통계
         analytics.byCategory[volunteer.category] =
           (analytics.byCategory[volunteer.category] || 0) + actualCount;
+
+        // 카테고리별 일정 수 카운트
+        analytics.byCategoryCount[volunteer.category] =
+          (analytics.byCategoryCount[volunteer.category] || 0) + 1;
 
         // 기관별 통계
         analytics.byOrganization[volunteer.organization] =
