@@ -22,8 +22,9 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import CategorySchedule from "./CategorySchedule";
 
-const VolunteerAnalytics = ({ analytics }) => {
+const VolunteerAnalytics = ({ analytics, volunteers }) => {
   const theme = useTheme();
   const {
     totalVolunteers,
@@ -283,6 +284,9 @@ const VolunteerAnalytics = ({ analytics }) => {
               </ResponsiveContainer>
             </Box>
           </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <CategorySchedule volunteers={volunteers} />
         </Grid>
       </Grid>
     </Box>
